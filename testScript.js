@@ -13,6 +13,15 @@ player2.oponent = player1;
 
 let gamespeed = 60
 
+let bg = new Image();
+bg.src = "./imgs/bgsf2.gif";
+
+bg.onload = () => {
+    console.log("Background image loaded");
+}
+
+let score = [0,0];
+
 document.addEventListener("keydown", (e) => {
     console.log(e.keyCode);
     if(controller[e.keyCode]){
@@ -21,10 +30,10 @@ document.addEventListener("keydown", (e) => {
 })
 document.addEventListener("keyup", (e) => {
     if(controller[e.keyCode]){
-        if ((e.keyCode === 65 || e.keyCode === 68)&& player1.state !== "kicking" && player1.state !== "dead") {
+        if ((e.keyCode === 65 || e.keyCode === 68)&& player1.state !== "kicking" && player1.state !== "dead" && player1.isOnFloor) {
         player1.velocity[0] = 0;
     }
-        if ((e.keyCode === 37 || e.keyCode === 39)&& player2.state !== "kicking" && player2.state !== "dead") {
+        if ((e.keyCode === 37 || e.keyCode === 39)&& player2.state !== "kicking" && player2.state !== "dead" && player2.isOnFloor) {
         player2.velocity[0] = 0;
     }
         controller[e.keyCode].pressed = false
@@ -61,6 +70,7 @@ function step() {
     player2.move();
     ctx.fillStyle = "white";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
+    if (bg.complete) ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
     //if either player is dead, draw hit effect
     if (player1.state === "dead" || player2.state === "dead") {
         if (player1.state === "dead") {
@@ -71,7 +81,6 @@ function step() {
             hitEffectCircle.x = player2.x + player2.width / 2;
             hitEffectCircle.y = player2.y + player2.height / 2;
             hitEffectCircle.color = "red";
-
         }
         hitEffectCircle.draw();
     }
@@ -79,7 +88,7 @@ function step() {
     ctx.fillRect(player1.x, player1.y, player1.width, player1.height);
     ctx.fillStyle = player2.color;
     ctx.fillRect(player2.x, player2.y, player2.width, player2.height);
-    ui.drawRoundStart();
+    ui.drawRoundStart(score);
     setTimeout(() => {
         requestAnimationFrame(step);
     }, 1000 / gamespeed);
@@ -93,6 +102,13 @@ canvas.changeSpeed = (newSpeed) => {
 }
 
 canvas.reset = () => {
+    if (player1.state === "dead") {
+        score[1] += 1;
+    } else {
+        score[0] += 1;
+    }
+
+
     player1.x = 100;
     player1.y = 400;
     player1.velocity = [0,0];
@@ -109,5 +125,5 @@ canvas.reset = () => {
     player2.color = "blue";
 
     hitEffectCircle.radius = 10;
-
+    
 }

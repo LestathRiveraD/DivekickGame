@@ -32,7 +32,7 @@ export default class Player {
     */
     moveLeft = () => 
     {
-        if (this.state === "kicking" || this.state === "dead") return
+        if (this.state === "kicking" || this.state === "dead"  || !this.isOnFloor) return
         this.velocity[0] = -5
         this.state = "walking"
         this.isFacingRight = false
@@ -40,7 +40,7 @@ export default class Player {
 
     moveRight = () => 
     {
-        if (this.state === "kicking" || this.state === "dead") return
+        if (this.state === "kicking" || this.state === "dead" || !this.isOnFloor) return
         this.velocity[0] = 5;
         this.state = "walking";
         this.isFacingRight = true;
