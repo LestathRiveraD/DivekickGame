@@ -79,7 +79,7 @@ function step() {
     ctx.fillRect(player1.x, player1.y, player1.width, player1.height);
     ctx.fillStyle = player2.color;
     ctx.fillRect(player2.x, player2.y, player2.width, player2.height);
-    ui.drawRoundStart(1);
+    ui.drawRoundStart();
     setTimeout(() => {
         requestAnimationFrame(step);
     }, 1000 / gamespeed);
@@ -109,4 +109,5 @@ canvas.reset = () => {
     player2.color = "blue";
 
     hitEffectCircle.radius = 10;
+
 }
