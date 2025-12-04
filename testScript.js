@@ -17,13 +17,13 @@ let bg = new Image();
 bg.src = "./imgs/bgsf2.gif";
 
 bg.onload = () => {
-    console.log("Background image loaded");
+    // console.log("Background image loaded");
 }
 
 let score = [0,0];
 
 document.addEventListener("keydown", (e) => {
-    console.log(e.keyCode);
+    // console.log(e.keyCode);
     if(controller[e.keyCode]){
         controller[e.keyCode].pressed = true
     }
@@ -98,7 +98,7 @@ requestAnimationFrame(step);
 
 canvas.changeSpeed = (newSpeed) => {
     gamespeed = newSpeed;
-    console.log("Game speed changed to: " + gamespeed);
+    // console.log("Game speed changed to: " + gamespeed);
 }
 
 canvas.reset = () => {
