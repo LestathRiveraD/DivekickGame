@@ -148,3 +148,7 @@ body {
     padding-right: 16px;
     font-size: 12px;
 }
+
+h1:last-child {
+    color: blue;
+}
