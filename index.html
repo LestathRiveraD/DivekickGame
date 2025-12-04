@@ -9,17 +9,30 @@
 <body>
     <div class="menu-container" id="menu">
         <h1 class="menu-title">holaaaaaa</h1>
+        <input type="text" id="jugador-1" placeholder="Máximo 15 caracteres" autocomplete="off">
+        <input type="text" id="jugador-2" placeholder="Máximo 15 caracteres" autocomplete="off">
         <div class="menu-items">
             <button class="menu-button play-button" id="playButton">Play</button>
         </div>
     </div>
-    <canvas width="1024" height="648" id="gameplay" style="display: none;"></canvas>
-
+    <canvas width="1024" height="648" id="gameplay" style="z-index: 1; position: absolute; display:none"></canvas>
+    <div id="curtain" style="z-index: 2; position: absolute; background-position:100px 200px; height:648px; width:1024px;">
+        <h1 id="nombre1">Nombre 1</h1>
+        <h1 id="nombre2">Nombre 2</h1>
+    </div>
     <script>
         const playButton = document.getElementById('playButton')
         const menu = document.getElementById('menu')
-
+        
         playButton.addEventListener('click', function() {
+            const jugador1 = document.getElementById("jugador-1").value
+            const jugador2 = document.getElementById("jugador-2").value
+    
+            if (jugador1.length <= 0 || jugador2.length <= 0 || jugador1.length > 15 || jugador2.length > 15) return
+
+            document.getElementById("nombre1").innerHTML = jugador1
+            document.getElementById("nombre2").innerHTML = jugador2
+
             menu.remove()
             const canvas = document.getElementById('gameplay')
             canvas.style.display = 'block'
