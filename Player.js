@@ -11,16 +11,8 @@ export default class Player {
         this.controls = controls
         this.hitbox = new HitBox(this.x, this.y, this.width, this.height)
         this.canvas = canvas
-        this.sprite = new Image();
-        this.spriteLoaded = false;
-        this.sprite.onload = () => {
-            this.spriteLoaded = true;
-            //console.log("Sprite loaded:", this.sprite.src);
-        };
-        this.sprite.onerror = () => {
-            console.error("Failed to load sprite:", this.sprite.src);
-        };
-        this.sprite.src = "./spr/sprites0.png";
+        this.sprite = new Image ()
+        this.sprite.src = "./spr/sprite_0.png"
     }
     
 
@@ -33,6 +25,8 @@ export default class Player {
     oponent = null // Debería apuntar a otro objeto Player que se asignara despues de su creacion
     hitsound = new Audio("./sfx/hurt.wav");
     atksound = new Audio("./sfx/happy.wav");
+    walkTogglenum = 0;
+    walkToggle = false;
 
     // Methods
     /*
@@ -77,9 +71,52 @@ export default class Player {
         else
             this.velocity[0] = -12
     }
+    dir = 0
 
+animcheck() {
+    // PRIORITY 1: Dead / Knockback animation
+    if (this.state === "dead") {
+        this.sprite.src = "./spr/sprite_4.png"; 
+        return;
+    }
+
+    // PRIORITY 2: Jumping (when not on floor)
+    if (!this.isOnFloor && this.state !== "kicking") {
+        this.sprite.src = "./spr/sprite_2.png";
+        return;
+    }
+
+    // Movement / idle / kicking
+    switch (this.state) {
+        case "idle":
+            this.sprite.src = "./spr/sprite_0.png";
+            break;
+
+        case "walking":
+            // Simple animation toggle
+            if (this.walkTogglenum % 20 === 0)
+            {
+                this.walkToggle = !this.walkToggle;
+                this.sprite.src = this.walkToggle 
+                    ? "./spr/sprite_1.png" 
+                    : "./spr/sprite_0.png";
+                this.walkTogglenum++
+                
+            }
+            if (this.velocity[0] !== 0) this.walkTogglenum++;
+            break;
+
+        case "kicking":
+            this.sprite.src = "./spr/sprite_3.png";
+            break;
+    }
+}
+
+    
     move() 
     {
+        if (this.isFacingRight) this.dir = 1
+        else this.dir = -1
         let canvas = this.canvas
         let ctx = canvas.getContext("2d");
         //check if kicking
@@ -92,8 +129,8 @@ export default class Player {
         this.velocity[1] = Math.max(Math.min(this.velocity[1], 10), this.jumpStrength);
         
         //clamp position to floor and walls
-        if (this.y + this.height + this.velocity[1] + 100 > canvas.height) {
-            this.y = canvas.height - this.height - 100;
+        if (this.y + this.height + this.velocity[1] + 200 > canvas.height) {
+            this.y = canvas.height - this.height - 200;
             this.velocity[1] = 0;
             this.isOnFloor = true;
             if (this.state === "kicking") {
@@ -123,8 +160,11 @@ export default class Player {
         //update hitbox position
         this.hitbox.x = this.x;
         this.hitbox.y = this.y;
-        if (this.spriteLoaded && this.sprite instanceof HTMLImageElement) {
-            ctx.drawImage(this.sprite, this.x, this.y, this.width, this.height);
+
+                this.animcheck();
+        if (this.sprite.complete)
+        {
+            this.drawSprite(ctx);
         }
     }
 
@@ -135,19 +175,32 @@ export default class Player {
         this.knockback(this.oponent.isFacingRight);
     }
 
-    knockback(towardsRight)
-    {
-        this.hitsound.play();
-        if (towardsRight)
-        {
-            this.velocity[0] = 10;
-            this.velocity[1] = -5;
-        } 
-        else 
-        {
-            this.velocity[0] = -10;
-            this.velocity[1] = -5;
-        }
-        this.canvas.changeSpeed(55);
+knockback(towardsRight) {
+    this.hitsound.play();
+    this.state = "dead";       // important for animcheck priority
+    this.sprite.src = "./spr/sprite_4.png";
+
+    if (towardsRight) {
+        this.velocity[0] = 10;
+        this.velocity[1] = -5;
+    } else {
+        this.velocity[0] = -10;
+        this.velocity[1] = -5;
     }
+
+    this.canvas.changeSpeed(55);
+}
+drawSprite(ctx) {
+    if (!this.sprite.complete) return;
+
+    if (this.isFacingRight) {
+        ctx.drawImage(this.sprite, this.x, this.y, 256, 256);
+    } else {
+        ctx.save();
+        ctx.scale(-1, 1);
+        ctx.drawImage(this.sprite, -this.x - 256, this.y, 256, 256);
+        ctx.restore();
+    }
+}
+
 }

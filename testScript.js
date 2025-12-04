@@ -6,10 +6,12 @@ const canvas = document.getElementById("gameplay");
 const ctx = canvas.getContext("2d");
 
 const player1 = new Player(100, 400, "red", ["a", "d", "w", "s"], canvas);
-const player2 = new Player(900,400, "blue", ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"], canvas);
+const player2 = new Player(700,400, "blue", ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"], canvas);
 
 player1.oponent = player2;
 player2.oponent = player1;
+
+player2.isFacingRight = false;
 
 let gamespeed = 60
 
@@ -76,11 +78,9 @@ document.getElementById("playButton").addEventListener("click", () => {
 function step() {
     //console.log("Step executed");
     executeMoves();
+    if (bg.complete) ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
     player1.move();
     player2.move();
-    ctx.fillStyle = "white";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    if (bg.complete) ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
     //if either player is dead, draw hit effect
     if (player1.state === "dead" || player2.state === "dead") {
         if (player1.state === "dead") {
@@ -94,8 +94,6 @@ function step() {
         }
         hitEffectCircle.draw();
     }
-    ctx.fillStyle = player2.color;
-    ctx.fillRect(player2.x, player2.y, player2.width, player2.height);
     ui.drawRoundStart(score);
     setTimeout(() => {
         requestAnimationFrame(step);
@@ -123,14 +121,16 @@ canvas.reset = () => {
     player1.state = "idle";
     player1.isOnFloor = true;
     player1.color = "red";
+    player1.isFacingRight = true;
 
 
-    player2.x = 900;
+    player2.x = 700;
     player2.y = 400;
     player2.velocity = [0,0];
     player2.state = "idle";
     player2.isOnFloor = true;
     player2.color = "blue";
+    player2.isFacingRight = false;
 
     hitEffectCircle.radius = 10;
     
