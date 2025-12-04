@@ -1,12 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>holaaaaaa</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <canvas width="1024px" height="648px" id="gameplay" style="border: solid;"></canvas>
+    <div class="menu-container" id="menu">
+        <h1 class="menu-title">holaaaaaa</h1>
+        <div class="menu-items">
+            <button class="menu-button play-button" id="playButton">Play</button>
+        </div>
+    </div>
+    <canvas width="1024" height="648" id="gameplay" style="display: none;"></canvas>
+
+    <script>
+        const playButton = document.getElementById('playButton')
+        const menu = document.getElementById('menu')
+
+        playButton.addEventListener('click', function() {
+            menu.remove()
+            const canvas = document.getElementById('gameplay')
+            canvas.style.display = 'block'
+        });
+
+        const menuButtons = document.querySelectorAll('.menu-button');
+        menuButtons.forEach(button => {
+            button.addEventListener('mouseenter', function() {
+                this.style.transition = 'all 0.1s ease'
+            });
+        });
+    </script>
+    <script src="testScript.js" type="module"></script>
 </body>
-<script src="testScript.js"></script>
 </html>

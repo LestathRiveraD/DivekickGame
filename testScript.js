@@ -1,65 +1,17 @@
+import Player from "./Player.js";
+import EffectBresenhamCircle from "./EffectBresenhamCircle.js";
+import UI from "./UI.js";
+
 const canvas = document.getElementById("gameplay");
 const ctx = canvas.getContext("2d");
 
-class Player {
-    constructor(x, y, color, controls) {
-        this.x = x;
-        this.y = y;
-        this.width = 50;
-        this.height = 100;
-        this.color = color;
-        this.controls = controls;
-    }
+const player1 = new Player(100, 400, "red", ["a", "d", "w", "s"], canvas);
+const player2 = new Player(900,400, "blue", ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"], canvas);
 
-    velocity = [0, 0];
+player1.oponent = player2;
+player2.oponent = player1;
 
-    state = "idle";
-    isOnFloor = true;
-    jumpStrength = -15;
-
-    moveLeft = () => {
-        this.velocity[0] = -5;
-    }
-    moveRight = () => {
-        this.velocity[0] = 5;
-    }
-
-    jump = () => {
-        if (!this.isOnFloor) return;
-        this.velocity[1] = this.jumpStrength;
-        this.isOnFloor = false;
-    }
-
-    move() {
-        //clamp values for velocity
-        this.velocity[0] = Math.max(Math.min(this.velocity[0], 5), -5);
-        this.velocity[1] = Math.max(Math.min(this.velocity[1], 10), this.jumpStrength);
-
-        //clamp position to floor and walls
-        if (this.y + this.height + this.velocity[1] + 100 > canvas.height) {
-            this.y = canvas.height - this.height - 100;
-            this.velocity[1] = 0;
-            this.isOnFloor = true;
-        }
-        if (this.x + this.velocity[0] < 0) {
-            this.x = 0;
-            this.velocity[0] = 0;
-        }
-        if (this.x + this.width + this.velocity[0] > canvas.width) {
-            this.x = canvas.width - this.width;
-            this.velocity[0] = 0;
-        }
-        this.x += this.velocity[0];
-        this.velocity[1] += 0.5; // gravity
-        this.y += this.velocity[1];
-    }
-
-
-}
-
-
-const player1 = new Player(100, 400, "red", ["a", "d", "w", "s"]);
-const player2 = new Player(1000,400, "blue", ["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"]);
+let gamespeed = 60
 
 document.addEventListener("keydown", (e) => {
     console.log(e.keyCode);
@@ -69,10 +21,10 @@ document.addEventListener("keydown", (e) => {
 })
 document.addEventListener("keyup", (e) => {
     if(controller[e.keyCode]){
-        if (e.keyCode === 65 || e.keyCode === 68) {
+        if ((e.keyCode === 65 || e.keyCode === 68)&& player1.state !== "kicking" && player1.state !== "dead") {
         player1.velocity[0] = 0;
     }
-        if (e.keyCode === 37 || e.keyCode === 39) {
+        if ((e.keyCode === 37 || e.keyCode === 39)&& player2.state !== "kicking" && player2.state !== "dead") {
         player2.velocity[0] = 0;
     }
         controller[e.keyCode].pressed = false
@@ -86,26 +38,75 @@ const executeMoves = () => {
 }
 
 const controller = {
-    // and d for player 1, left and right arrows for player 2
+    // a and d for player 1, left and right arrows for player 2
+    // w for player 1 jump, up arrow for player 2 jump
+    // s and down arrows for kick
     65: {pressed: false, func: player1.moveLeft},
     68: {pressed: false, func: player1.moveRight},
     87: {pressed: false, func: player1.jump},
+    83: {pressed: false, func: player1.kick},
     37: {pressed: false, func: player2.moveLeft},
     39: {pressed: false, func: player2.moveRight},
     38: {pressed: false, func: player2.jump},
+    40: {pressed: false, func: player2.kick},
 }
+
+const hitEffectCircle = new EffectBresenhamCircle(400, 300, 10, "green", ctx, 10);
+const ui = new UI(ctx, canvas);
 
 function step() {
     //console.log("Step executed");
     executeMoves();
     player1.move();
     player2.move();
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "white";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    //if either player is dead, draw hit effect
+    if (player1.state === "dead" || player2.state === "dead") {
+        if (player1.state === "dead") {
+            hitEffectCircle.x = player1.x + player1.width / 2;
+            hitEffectCircle.y = player1.y + player1.height / 2;
+            hitEffectCircle.color = "blue";
+        } else {
+            hitEffectCircle.x = player2.x + player2.width / 2;
+            hitEffectCircle.y = player2.y + player2.height / 2;
+            hitEffectCircle.color = "red";
+
+        }
+        hitEffectCircle.draw();
+    }
     ctx.fillStyle = player1.color;
     ctx.fillRect(player1.x, player1.y, player1.width, player1.height);
     ctx.fillStyle = player2.color;
     ctx.fillRect(player2.x, player2.y, player2.width, player2.height);
-    requestAnimationFrame(step);
+    ui.drawRoundStart(1);
+    setTimeout(() => {
+        requestAnimationFrame(step);
+    }, 1000 / gamespeed);
 }
 
 requestAnimationFrame(step);
+
+canvas.changeSpeed = (newSpeed) => {
+    gamespeed = newSpeed;
+    console.log("Game speed changed to: " + gamespeed);
+}
+
+canvas.reset = () => {
+    player1.x = 100;
+    player1.y = 400;
+    player1.velocity = [0,0];
+    player1.state = "idle";
+    player1.isOnFloor = true;
+    player1.color = "red";
+
+
+    player2.x = 900;
+    player2.y = 400;
+    player2.velocity = [0,0];
+    player2.state = "idle";
+    player2.isOnFloor = true;
+    player2.color = "blue";
+
+    hitEffectCircle.radius = 10;
+}
