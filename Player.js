@@ -11,8 +11,19 @@ export default class Player {
         this.controls = controls
         this.hitbox = new HitBox(this.x, this.y, this.width, this.height)
         this.canvas = canvas
+        this.sprite = new Image();
+        this.spriteLoaded = false;
+        this.sprite.onload = () => {
+            this.spriteLoaded = true;
+            //console.log("Sprite loaded:", this.sprite.src);
+        };
+        this.sprite.onerror = () => {
+            console.error("Failed to load sprite:", this.sprite.src);
+        };
+        this.sprite.src = "./spr/sprites0.png";
     }
     
+
     // Atributes
     velocity = [0, 0]
     state = "idle"
@@ -20,8 +31,9 @@ export default class Player {
     isOnFloor = true
     jumpStrength = -15
     oponent = null // Debería apuntar a otro objeto Player que se asignara despues de su creacion
-    sprite = null // Debería apuntar a una imágen o spritesheet
-    
+    hitsound = new Audio("./sfx/hurt.wav");
+    atksound = new Audio("./sfx/happy.wav");
+
     // Methods
     /*
         move
@@ -56,6 +68,7 @@ export default class Player {
 
     kick = () =>
     {
+        this.atksound.play();
         if (this.isOnFloor || this.state === "kicking" || this.state === "dead") return
         this.state = "kicking";
         this.velocity[1] = 5
@@ -68,7 +81,7 @@ export default class Player {
     move() 
     {
         let canvas = this.canvas
-
+        let ctx = canvas.getContext("2d");
         //check if kicking
         if (this.state === "kicking" && this.hitbox.checkCollision(this.oponent)) {
             this.oponent.dead();
@@ -110,6 +123,9 @@ export default class Player {
         //update hitbox position
         this.hitbox.x = this.x;
         this.hitbox.y = this.y;
+        if (this.spriteLoaded && this.sprite instanceof HTMLImageElement) {
+            ctx.drawImage(this.sprite, this.x, this.y, this.width, this.height);
+        }
     }
 
     dead() 
@@ -121,6 +137,7 @@ export default class Player {
 
     knockback(towardsRight)
     {
+        this.hitsound.play();
         if (towardsRight)
         {
             this.velocity[0] = 10;

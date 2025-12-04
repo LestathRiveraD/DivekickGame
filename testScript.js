@@ -22,6 +22,12 @@ bg.onload = () => {
 
 let score = [0,0];
 
+let music = new Audio("./sfx/bgMusic.mp3");
+music.loop = true;
+music.volume = 0.5;
+
+
+
 document.addEventListener("keydown", (e) => {
     console.log(e.keyCode);
     if(controller[e.keyCode]){
@@ -63,6 +69,10 @@ const controller = {
 const hitEffectCircle = new EffectBresenhamCircle(400, 300, 10, "green", ctx, 10);
 const ui = new UI(ctx, canvas);
 
+document.getElementById("playButton").addEventListener("click", () => {
+    music.play();
+});
+
 function step() {
     //console.log("Step executed");
     executeMoves();
@@ -84,8 +94,6 @@ function step() {
         }
         hitEffectCircle.draw();
     }
-    ctx.fillStyle = player1.color;
-    ctx.fillRect(player1.x, player1.y, player1.width, player1.height);
     ctx.fillStyle = player2.color;
     ctx.fillRect(player2.x, player2.y, player2.width, player2.height);
     ui.drawRoundStart(score);
