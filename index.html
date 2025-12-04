@@ -9,8 +9,8 @@
 <body>
     <div class="menu-container" id="menu">
         <h1 class="menu-title">holaaaaaa</h1>
-        <input type="text" id="jugador-1">
-        <input type="text" id="jugador-2">
+        <input type="text" id="jugador-1" placeholder="Máximo 15 caracteres" autocomplete="off">
+        <input type="text" id="jugador-2" placeholder="Máximo 15 caracteres" autocomplete="off">
         <div class="menu-items">
             <button class="menu-button play-button" id="playButton">Play</button>
         </div>
@@ -28,9 +28,10 @@
             const jugador1 = document.getElementById("jugador-1").value
             const jugador2 = document.getElementById("jugador-2").value
     
+            if (jugador1.length <= 0 || jugador2.length <= 0 || jugador1.length > 15 || jugador2.length > 15) return
+
             document.getElementById("nombre1").innerHTML = jugador1
             document.getElementById("nombre2").innerHTML = jugador2
-
 
             menu.remove()
             const canvas = document.getElementById('gameplay')
