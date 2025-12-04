@@ -29,7 +29,7 @@ export default class UI {
             if (this.starsImage && this.starsImage.complete) {
                 this.ctx.drawImage(this.starsImage, 10 + i * 21, 30 + 3 * Math.sin(this.sin_off), 40, 40);
             }
-        this.sin_off += 0.01;
+        this.sin_off += 0.05;
         }
         for (let i = 0; i < score[1]; i++) {
             if (this.starsImage && this.starsImage.complete) {

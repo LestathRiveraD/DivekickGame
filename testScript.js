@@ -30,10 +30,10 @@ document.addEventListener("keydown", (e) => {
 })
 document.addEventListener("keyup", (e) => {
     if(controller[e.keyCode]){
-        if ((e.keyCode === 65 || e.keyCode === 68)&& player1.state !== "kicking" && player1.state !== "dead" && player1.isOnFloor) {
+        if ((e.keyCode === 65 || e.keyCode === 68)&& player1.state !== "kicking" && player1.state !== "dead") {
         player1.velocity[0] = 0;
     }
-        if ((e.keyCode === 37 || e.keyCode === 39)&& player2.state !== "kicking" && player2.state !== "dead" && player2.isOnFloor) {
+        if ((e.keyCode === 37 || e.keyCode === 39)&& player2.state !== "kicking" && player2.state !== "dead") {
         player2.velocity[0] = 0;
     }
         controller[e.keyCode].pressed = false
